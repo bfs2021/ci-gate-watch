@@ -7,6 +7,7 @@ COMPLIANT = {
     "required_pull_request_reviews": {
         "required_approving_review_count": 2,
         "dismiss_stale_reviews": True,
+        "require_code_owner_reviews": {"enabled": True},
     },
     "required_status_checks": {
         "strict": True,
@@ -25,6 +26,7 @@ POLICY = {
     "enforce_admins": True,
     "required_linear_history": True,
     "required_signed_commits": False,
+    "require_code_owner_reviews": True,
     "allow_force_pushes": False,
     "allow_deletions": False,
 }
@@ -158,3 +160,46 @@ def test_a_policy_requiring_more_reviews_than_configured_reports_one_finding():
     findings = audit(POLICY, actual)
     assert len(only(findings, "required_reviews_missing")) == 1
     assert only(findings, "required_reviews_low") == []
+
+
+def test_missing_code_owner_reviews_is_found():
+    actual = {**COMPLIANT, "required_pull_request_reviews": {"required_approving_review_count": 2}}
+    found = only(audit(POLICY, actual), "code_owner_reviews_disabled")
+    assert len(found) == 1
+    assert found[0].severity == "error"
+    assert found[0].key == "require_code_owner_reviews"
+
+
+def test_disabled_code_owner_reviews_is_found():
+    actual = {
+        **COMPLIANT,
+        "required_pull_request_reviews": {
+            "required_approving_review_count": 2,
+            "require_code_owner_reviews": {"enabled": False},
+        },
+    }
+    assert kinds(audit(POLICY, actual)) == ["code_owner_reviews_disabled"]
+
+
+def test_code_owner_reviews_not_required_is_not_drift():
+    policy = relaxed(require_code_owner_reviews=False)
+    assert audit(policy, COMPLIANT) == []
+
+
+def test_every_bool_policy_key_is_audited():
+    # Invariant: any key load_policy accepts must be able to produce a finding.
+    # A validated-but-inert key is exactly the require_code_owner_reviews bug
+    # (#8) -- the gate can never fail, which is worse than the key not existing.
+    from ci_gate_watch.policy import _BOOL_FIELDS
+
+    triggers = {
+        "enforce_admins": (True, {}),
+        "required_linear_history": (True, {}),
+        "required_signed_commits": (True, {}),
+        "require_code_owner_reviews": (True, {}),
+        "allow_force_pushes": (False, {"allow_force_pushes": {"enabled": True}}),
+        "allow_deletions": (False, {"allow_deletions": {"enabled": True}}),
+    }
+    for key in _BOOL_FIELDS:
+        policy_value, actual = triggers[key]
+        assert audit({key: policy_value}, actual), f"policy key {key!r} is inert"

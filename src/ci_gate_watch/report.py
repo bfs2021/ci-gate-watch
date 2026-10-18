@@ -33,6 +33,7 @@ _HELP: dict[str, str] = {
     "enforce_admins_disabled": "Admins are exempt from the gates the policy requires.",
     "required_linear_history_disabled": "The policy requires a linear history; the branch does not.",
     "required_signed_commits_disabled": "The policy requires signed commits; the branch does not.",
+    "code_owner_reviews_disabled": "The policy requires code owner reviews; the branch does not.",
     "linear_history_disabled": "The policy requires a linear history; the branch does not.",
     "signed_commits_disabled": "The policy requires signed commits; the branch does not.",
     "force_pushes_allowed": "The branch allows force pushes although the policy forbids them.",

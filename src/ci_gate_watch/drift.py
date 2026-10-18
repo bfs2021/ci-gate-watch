@@ -165,6 +165,25 @@ def _flag_drift(policy: dict[str, Any], actual: dict[str, Any]) -> list[Drift]:
             )
         )
 
+    # Nested under required_pull_request_reviews, not a top-level block.
+    if policy.get("require_code_owner_reviews"):
+        reviews = actual.get("required_pull_request_reviews")
+        flag = reviews.get("require_code_owner_reviews") if isinstance(reviews, dict) else None
+        if not _enabled(flag):
+            findings.append(
+                Drift(
+                    drift_type="code_owner_reviews_disabled",
+                    severity="error",
+                    message=(
+                        "policy sets require_code_owner_reviews: true but code owner "
+                        "reviews are not required on the branch"
+                    ),
+                    key="require_code_owner_reviews",
+                    expected=True,
+                    actual=False,
+                )
+            )
+
     for policy_key, config_key, drift_type in (
         ("allow_force_pushes", "allow_force_pushes", "force_pushes_allowed"),
         ("allow_deletions", "allow_deletions", "deletions_allowed"),
