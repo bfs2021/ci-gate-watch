@@ -1,3 +1,5 @@
+
+
 # ci-gate-watch
 
 Detect when a repository's CI/CD validation gates drift from declared policy — required reviews, branch protection, required checks, CI enforcement.
