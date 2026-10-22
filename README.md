@@ -2,6 +2,8 @@
 
 # ci-gate-watch
 
+![CI](https://github.com/yunaremaia/ci-gate-watch/actions/workflows/ci.yml/badge.svg) ![License](https://img.shields.io/github/license/yunaremaia/ci-gate-watch) ![PyPI](https://img.shields.io/pypi/v/ci-gate-watch)
+
 Detect when a repository's CI/CD validation gates drift from declared policy — required reviews, branch protection, required checks, CI enforcement.
 
 > **Status: 0.1.0.** Policy-vs-branch-protection auditing and workflow-vs-required-check auditing are implemented and tested. Org-wide scanning, App ID drift and lookback-window checks (issues #5, #6 in part) are **not** implemented — see [Limitations](#limitations).
