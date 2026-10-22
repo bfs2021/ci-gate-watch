@@ -86,6 +86,20 @@ def test_sarif_has_one_result_and_one_rule_per_type():
     }
 
 
+def test_sarif_has_help_for_protection_missing():
+    finding = Drift(
+        drift_type="protection_missing",
+        severity="error",
+        message="the branch has no protection configured",
+    )
+
+    payload = json.loads(render_sarif([finding], repo="owner/repo"))
+    rule = payload["runs"][0]["tool"]["driver"]["rules"][0]
+
+    assert rule["id"] == "protection_missing"
+    assert rule["shortDescription"]["text"] != "protection_missing"
+
+
 def test_sarif_maps_severity_to_level():
     payload = json.loads(render_sarif([ERROR, WARNING], repo="owner/repo"))
     assert [r["level"] for r in payload["runs"][0]["results"]] == ["error", "warning"]

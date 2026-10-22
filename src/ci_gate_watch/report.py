@@ -40,6 +40,7 @@ _HELP: dict[str, str] = {
     "deletions_allowed": "The branch allows deletions although the policy forbids them.",
     "required_check_orphaned": "A required check is not produced by any workflow.",
     "required_check_not_on_pull_request": "A required check's workflow does not run on pull_request.",
+    "protection_missing": "The branch has no protection configured, so the policy cannot be enforced.",
 }
 
 
